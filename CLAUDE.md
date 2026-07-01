@@ -60,12 +60,19 @@ antes de poner cámaras en producción.
 5. **Réplica**: desplegar a las demás estaciones.
 
 ## Estado actual
-Estamos en fase de diseño, a punto de arrancar la Fase 1 (módulo Odoo). No hay código escrito
-todavía. Próximo paso: definir la estructura del módulo Odoo (nombre técnico, dependencias,
-estructura de carpetas) y el modelo `workstation.presence.event`.
+**Fase 1 implementada.** Módulo Odoo `ci_workstation_monitor/` (depende de `mrp`, Odoo 19),
+verificado contra el fuente oficial de Odoo 19. Incluye:
+- Modelo `workstation.presence.event` (presencia/ausencia/zona/tiempo estático/heartbeat,
+  vinculado a `mrp.workcenter` y opcionalmente a `mrp.workorder`, con bandera `is_anomalous`).
+- Controlador HTTP propio `POST /workstation/event` (`type='http'`, API key por estación).
+- Extensión de `mrp.workcenter` (API key + umbral de tiempo estático) y vistas/menú.
+- Probable sin hardware con `curl` (ver `ci_workstation_monitor/README.md`).
 
-## Preguntas abiertas para resolver durante el desarrollo
-- Nombre técnico del módulo Odoo custom.
-- Umbral de tiempo estático que se considera "anómalo" por tipo de proceso.
-- Cómo se autentica cada RPi5 ante el endpoint (API key por estación vs. una sola compartida).
-- Framework de inferencia final: YOLO11n-pose vs. detección de zona simple con bounding boxes.
+Próximo paso: instalar el módulo en `app7.ventabot.cloud`, generar API keys por estación y
+simular eventos; luego Fase 2 (kiosk piloto).
+
+## Preguntas abiertas — decisiones tomadas en Fase 1
+- **Nombre técnico del módulo:** `ci_workstation_monitor`. ✅
+- **Autenticación RPi5:** API key **por estación** (`mrp.workcenter.ws_api_key`). ✅
+- **Umbral de tiempo estático:** por centro de trabajo (`ws_static_threshold`, default 300 s). ✅
+- **Framework de inferencia final:** YOLO11n-pose vs. bounding boxes de zona — pendiente (Fase 3).

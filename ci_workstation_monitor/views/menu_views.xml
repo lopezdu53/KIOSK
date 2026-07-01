@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Menú dentro de Manufacturing -->
+    <menuitem id="menu_workstation_monitor_root"
+              name="Monitoreo de Puestos"
+              parent="mrp.menu_mrp_root"
+              sequence="90"/>
+
+    <menuitem id="menu_workstation_presence_event"
+              name="Eventos de presencia"
+              parent="menu_workstation_monitor_root"
+              action="workstation_presence_event_action"
+              sequence="10"/>
+
+</odoo>

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Vista lista -->
+    <record id="workstation_presence_event_view_list" model="ir.ui.view">
+        <field name="name">workstation.presence.event.list</field>
+        <field name="model">workstation.presence.event</field>
+        <field name="arch" type="xml">
+            <list string="Eventos de presencia"
+                  decoration-danger="is_anomalous"
+                  decoration-muted="event_type == 'heartbeat'">
+                <field name="timestamp"/>
+                <field name="workcenter_id"/>
+                <field name="event_type"/>
+                <field name="workorder_id" optional="show"/>
+                <field name="workorder_state" optional="hide"/>
+                <field name="product_id" optional="hide"/>
+                <field name="zone" optional="hide"/>
+                <field name="duration_seconds" sum="Total (s)"/>
+                <field name="is_anomalous"/>
+                <field name="confidence" optional="hide"/>
+                <field name="source_device" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Vista formulario -->
+    <record id="workstation_presence_event_view_form" model="ir.ui.view">
+        <field name="name">workstation.presence.event.form</field>
+        <field name="model">workstation.presence.event</field>
+        <field name="arch" type="xml">
+            <form string="Evento de presencia">
+                <sheet>
+                    <widget name="web_ribbon" title="Anómalo" bg_color="text-bg-danger"
+                            invisible="not is_anomalous"/>
+                    <group>
+                        <group string="Evento">
+                            <field name="event_type"/>
+                            <field name="timestamp"/>
+                            <field name="duration_seconds"/>
+                            <field name="is_anomalous"/>
+                            <field name="zone"/>
+                        </group>
+                        <group string="Contexto">
+                            <field name="workcenter_id"/>
+                            <field name="workorder_id"/>
+                            <field name="workorder_state"/>
+                            <field name="production_id"/>
+                            <field name="product_id"/>
+                        </group>
+                        <group string="Origen / IA">
+                            <field name="source_device"/>
+                            <field name="confidence"/>
+                        </group>
+                    </group>
+                    <field name="note" placeholder="Nota..."/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Búsqueda / filtros -->
+    <record id="workstation_presence_event_view_search" model="ir.ui.view">
+        <field name="name">workstation.presence.event.search</field>
+        <field name="model">workstation.presence.event</field>
+        <field name="arch" type="xml">
+            <search string="Eventos de presencia">
+                <field name="workcenter_id"/>
+                <field name="workorder_id"/>
+                <field name="event_type"/>
+                <field name="source_device"/>
+                <filter name="anomalous" string="Anómalos"
+                        domain="[('is_anomalous', '=', True)]"/>
+                <separator/>
+                <filter name="absence" string="Ausencias"
+                        domain="[('event_type', '=', 'absence')]"/>
+                <filter name="static" string="Tiempo estático"
+                        domain="[('event_type', '=', 'static')]"/>
+                <separator/>
+                <filter name="today" string="Hoy"
+                        domain="[('timestamp', '&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0)))]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter name="group_workcenter" string="Centro de trabajo"
+                            context="{'group_by': 'workcenter_id'}"/>
+                    <filter name="group_type" string="Tipo de evento"
+                            context="{'group_by': 'event_type'}"/>
+                    <filter name="group_workorder" string="Orden de trabajo"
+                            context="{'group_by': 'workorder_id'}"/>
+                    <filter name="group_day" string="Día"
+                            context="{'group_by': 'timestamp:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Acción -->
+    <record id="workstation_presence_event_action" model="ir.actions.act_window">
+        <field name="name">Eventos de presencia</field>
+        <field name="res_model">workstation.presence.event</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="workstation_presence_event_view_search"/>
+        <field name="context">{'search_default_group_workcenter': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Aún no hay eventos de presencia
+            </p>
+            <p>
+                Los RPi5 con cámara/IA registran aquí presencia, ausencia, zona
+                y tiempo estático vía <code>POST /workstation/event</code>.
+            </p>
+        </field>
+    </record>
+
+</odoo>

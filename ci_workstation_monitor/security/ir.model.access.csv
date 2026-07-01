@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_workstation_presence_event_user,workstation.presence.event.user,model_workstation_presence_event,mrp.group_mrp_user,1,0,0,0
+access_workstation_presence_event_manager,workstation.presence.event.manager,model_workstation_presence_event,mrp.group_mrp_manager,1,1,1,1
